@@ -14,20 +14,28 @@ public class Main {
         System.out.println("=== Day " + day + " ===");
         int[] startNumbers = { 21, 1, 20, 23 };
         int iterative = chooseHobbyIterative(startNumbers, day);
-        int recursive = chooseHobbyRecursive(startNumbers, day);
-        System.out.println("Iterative = " + iterative + " | Recursive = " + recursive);
+        int dp = chooseHobbyDP(startNumbers, day);
+        System.out.println("Iterative = " + iterative + " | DP = " + dp);
         System.out.println();
     }
 
-    public static int chooseHobbyRecursive(int[] startNumbers, int day) {
-        if (day <= 4) {
-            return startNumbers[day - 1];
-        }
-        int prev = chooseHobbyRecursive(startNumbers, day - 1);
-        int prePrePrev = chooseHobbyRecursive(startNumbers, day - 3);
-        return (prev * prePrePrev) % 10 + 1;
-    }
+    public static int chooseHobbyDP(int[] startNumbers, int day) {
 
+        int[] dp = new int[Math.max(day, 4)];
+
+        for (int i = 0; i < 4; i++) {
+            dp[i] = startNumbers[i];
+        }
+
+        for (int d = 4; d < day; d++) {
+            int prev = dp[d - 1];
+            int prePrePrev = dp[d - 3];
+            dp[d] = (prev * prePrePrev) % 10 + 1;
+        }
+
+        return dp[day - 1];
+    }
+    
     public static int chooseHobbyIterative(int[] startNumbers, int day) {
         List<Integer> numbers = new ArrayList<>();
         numbers.add(startNumbers[0]);
