@@ -14,30 +14,37 @@ public class Main {
         System.out.println("=== Day " + day + " ===");
         int[] startNumbers = { 21, 1, 20, 23 };
         int iterative = chooseHobbyIterative(startNumbers, day);
-        int dp = chooseHobbyDP(startNumbers, day);
-        System.out.println("Iterative = " + iterative + " | DP = " + dp);
+        int recursive = chooseHobbyRecursive(startNumbers, day);
+        System.out.println("Iterative = " + iterative + " | Recursive = " + recursive);
         System.out.println();
     }
 
-    public static int chooseHobbyDP(int[] startNumbers, int day) {
+    public static int chooseHobbyRecursive(int[] startNumbers, int day) {
 
-        int[] dp = new int[Math.max(day, 4)];
+        int[] dp = new int[day + 4];
 
         for (int i = 0; i < 4; i++) {
             dp[i] = startNumbers[i];
         }
+        return helper(dp, day + 3);
+    }
 
-        for (int d = 4; d < day; d++) {
-            int prev = dp[d - 1];
-            int prePrePrev = dp[d - 3];
-            dp[d] = (prev * prePrePrev) % 10 + 1;
+    private static int helper(int[] dp, int index) {
+        if (dp[index] != 0) {
+            return dp[index];
         }
 
-        return dp[day - 1];
+        int prev = helper(dp, index - 1);
+        int prePrePrev = helper(dp, index - 3);
+
+        dp[index] = (prev * prePrePrev) % 10 + 1;
+
+        return dp[index];
     }
-    
+
     public static int chooseHobbyIterative(int[] startNumbers, int day) {
         List<Integer> numbers = new ArrayList<>();
+
         numbers.add(startNumbers[0]);
         numbers.add(startNumbers[1]);
         numbers.add(startNumbers[2]);
