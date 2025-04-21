@@ -1,62 +1,54 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 
 public class Main {
 
-    public static void main(String[] args) {
-        compare(1);
-        compare(2);
-        compare(5);
-        compare(15);
+    public static void main(String[] args) throws IOException {
+        int[][] teams = {
+                { 45, 31, 24, 22, 20, 17, 14, 13, 12, 10 },
+                { 31, 18, 15, 12, 10, 8, 6, 4, 2, 1 },
+                { 51, 30, 10, 9, 8, 7, 6, 5, 2, 1 }
+        };
+        int[] nationalTeam = mergeAll(teams);
+        System.out.println(Arrays.toString(nationalTeam));
     }
 
-    public static void compare(int day) {
-        System.out.println("=== Day " + day + " ===");
-        int[] startNumbers = { 21, 1, 20, 23 };
-        int iterative = chooseHobbyIterative(startNumbers, day);
-        int recursive = chooseHobbyRecursive(startNumbers, day);
-        System.out.println("Iterative = " + iterative + " | Recursive = " + recursive);
-        System.out.println();
-    }
-
-    public static int chooseHobbyRecursive(int[] startNumbers, int day) {
-
-        int[] dp = new int[day + 4];
-
-        for (int i = 0; i < 4; i++) {
-            dp[i] = startNumbers[i];
-        }
-        return helper(dp, day + 3);
-    }
-
-    private static int helper(int[] dp, int index) {
-        if (dp[index] != 0) {
-            return dp[index];
+    public static int[] mergeAll(int[][] teams) {
+        PriorityQueue<Element> minHeap = new PriorityQueue<>(Comparator.comparingInt(e -> e.value));
+        for (int i = 0; i < teams.length; i++) {
+            if (teams[i].length > 0) {
+                minHeap.offer(new Element(teams[i][0], i, 0));
+            }
         }
 
-        int prev = helper(dp, index - 1);
-        int prePrePrev = helper(dp, index - 3);
+        int[] result = new int[10];
+        int index = 0;
 
-        dp[index] = (prev * prePrePrev) % 10 + 1;
+        while (!minHeap.isEmpty() && index < 10) {
+            Element current = minHeap.poll();
+            result[index++] = current.value;
 
-        return dp[index];
-    }
-
-    public static int chooseHobbyIterative(int[] startNumbers, int day) {
-        List<Integer> numbers = new ArrayList<>();
-
-        numbers.add(startNumbers[0]);
-        numbers.add(startNumbers[1]);
-        numbers.add(startNumbers[2]);
-        numbers.add(startNumbers[3]);
-
-        for (int d = 0; d < day; d++) {
-            int index = d + 4;
-            int prev = numbers.get(index - 1);
-            int prePrePrev = numbers.get(index - 3);
-            numbers.add((prev * prePrePrev) % 10 + 1);
+            if (current.indexInArray + 1 < teams[current.arrayIndex].length) {
+                minHeap.offer(new Element(
+                        teams[current.arrayIndex][current.indexInArray + 1],
+                        current.arrayIndex,
+                        current.indexInArray + 1
+                ));
+            }
         }
 
-        return numbers.get(numbers.size() - 1);
+        return result;
+    }
+
+    static class Element {
+        int value;
+        int arrayIndex;
+        int indexInArray;
+
+        public Element(int value, int arrayIndex, int indexInArray) {
+            this.value = value;
+            this.arrayIndex = arrayIndex;
+            this.indexInArray = indexInArray;
+        }
     }
 }
