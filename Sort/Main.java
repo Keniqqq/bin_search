@@ -1,9 +1,8 @@
-import java.io.*;
-import java.util.*;
+import java.util.Arrays;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         int[][] teams = {
                 { 45, 31, 24, 22, 20, 17, 14, 13, 12, 10 },
                 { 31, 18, 15, 12, 10, 8, 6, 4, 2, 1 },
@@ -14,41 +13,29 @@ public class Main {
     }
 
     public static int[] mergeAll(int[][] teams) {
-        PriorityQueue<Element> minHeap = new PriorityQueue<>(Comparator.comparingInt(e -> e.value));
-        for (int i = 0; i < teams.length; i++) {
-            if (teams[i].length > 0) {
-                minHeap.offer(new Element(teams[i][0], i, 0));
-            }
-        }
-
+        int[] indices = new int[teams.length];
         int[] result = new int[10];
         int index = 0;
 
-        while (!minHeap.isEmpty() && index < 10) {
-            Element current = minHeap.poll();
-            result[index++] = current.value;
+        while (index < 10) {
+            int maxValue = Integer.MIN_VALUE;
+            int maxArrayIndex = -1;
 
-            if (current.indexInArray + 1 < teams[current.arrayIndex].length) {
-                minHeap.offer(new Element(
-                        teams[current.arrayIndex][current.indexInArray + 1],
-                        current.arrayIndex,
-                        current.indexInArray + 1
-                ));
+            for (int i = 0; i < teams.length; i++) {
+                if (indices[i] < teams[i].length && teams[i][indices[i]] > maxValue) {
+                    maxValue = teams[i][indices[i]];
+                    maxArrayIndex = i;
+                }
             }
+
+            if (maxArrayIndex == -1) {
+                break;
+            }
+
+            result[index++] = maxValue;
+            indices[maxArrayIndex]++;
         }
 
         return result;
-    }
-
-    static class Element {
-        int value;
-        int arrayIndex;
-        int indexInArray;
-
-        public Element(int value, int arrayIndex, int indexInArray) {
-            this.value = value;
-            this.arrayIndex = arrayIndex;
-            this.indexInArray = indexInArray;
-        }
     }
 }
